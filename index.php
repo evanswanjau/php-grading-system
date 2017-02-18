@@ -41,20 +41,33 @@
         color:black;
       }
       .errs{
-        width:100%;
         font-family:monospace;
         position:absolute;
         text-align: right;
         top:40%;
         background-color:#fff;
         color:#000;
-        width:18%;
+        width:25%;
         padding:1%;
         border-radius:5px;
         margin:5%;
       }
       .errs p{
         text-align: left;
+      }
+      .reveal{
+        color:white;
+        position: absolute;
+        top:100%;
+        font-family:century gothic;
+        text-align: center;
+      }
+      table{
+        padding:5%;
+      }
+      td{
+        padding:2%;
+        width:5%;
       }
     </style>
   </head>
@@ -173,28 +186,64 @@
           // Check connection
           if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
-          }else {
-            echo "string";
           }
 
           $grade = getGrade($t);
 
-          $sql = "INSERT INTO students (name, maths, english, swahili, science, sscre, total, grade)
-          VALUES ('$name', '$maths', '$english', '$swahili', '$science', '$sscre', '$t', '$grade')";
+          if($name == true){
+            $sql = "INSERT INTO students (name, maths, english, swahili, science, sscre, total, grade)
+            VALUES ('$name', '$maths', '$english', '$swahili', '$science', '$sscre', '$t', '$grade')";
 
-          if ($conn->query($sql) === TRUE) {
-            echo "<p>Student: " . $name . '</p>';
-            echo '<p>Maths: '. $m . '</p><p>English: ' . $e . '</p><p>Swahili: ' . $s .'</p><p>Science: '. $sc . '</p><p>SSCRE: ' . $ss . '</p>';
-            echo '<p>' . intval($t) . '% ' . $grade . '</p>';
-            echo "success";
+            if ($conn->query($sql) === TRUE) {
+              echo "<p>Student: " . $name . '</p>';
+              echo '<p>Maths: '. $m . '</p><p>English: ' . $e . '</p><p>Swahili: ' . $s .'</p><p>Science: '. $sc . '</p><p>SSCRE: ' . $ss . '</p>';
+              echo '<p>' . intval($t) . '% ' . $grade . '</p>';
+            }else{
+              echo "Error: " . $sql . "<br>" . $conn->error;
+            }
           }else{
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo $nameErr;
+            echo $mathsErr;
+            echo $englishErr;
+            echo $swahiliErr;
+            echo $scienceErr;
+            echo $sscreErr;
           }
 
 
       }
        ?>
      </div>
+    </div>
+    <div class="reveal">
+      <h1>Student's results</h1>
+      <table border="1">
+        <tr>
+          <th>Student</th>
+          <th>Maths</th>
+          <th>English</th>
+          <th>Swahili</th>
+          <th>Science</th>
+          <th>SSCRE</th>
+          <th>Total(%)</th>
+          <th>Grade</th>
+        </tr>
+      <?php
+
+      $sql2 = "SELECT * FROM students ORDER BY `total` DESC";
+      $result = $conn->query($sql2);
+
+      if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+          echo "<tr><td>" . $row["name"] . "</td><td>" . $row["maths"] . "</td><td>" . $row["english"] . "</td><td>" . $row["swahili"] . "</td><td>" . $row["science"] . "</td><td>" . $row["sscre"] . "</td><td>" . $row["total"] . "</td><td>" . $row["grade"] . "</td></tr>";
+      }
+    }else{
+        echo "No data to display";
+      }
+
+       ?>
+
+     </table>
     </div>
   </body>
 </html>
